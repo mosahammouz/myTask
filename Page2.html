@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            
+        }
+    
+        td {
+            border: 1px solid #000;
+         height: 100px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+    <h1 style="text-decoration: underline;">Personl Detail Page :</h1>
+<br><br>
+
+<table>
+    <tr>
+        <td>
+            <div style="float: left;">
+                <p><strong>Id:</strong> <span id="personId"></span></p>
+                <p><strong>Name:</strong> <span id="personName"></span></p>
+                <p><strong>Gender:</strong> <span id="personGender"></span></p>
+                <p><strong>Height:</strong> <span id="personHeight"></span></p>
+                <p><strong>Hair Color:</strong> <span id="personHairColor"></span></p>
+                <p><strong>Created Date:</strong> <span id="personCreated"></span></p>
+            </div>
+        </td>
+
+
+
+        <td>
+            <table style="border-collapse: collapse; width: 60%;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid black; padding: 8px;">Title</th>
+                        <th style="border: 1px solid black; padding: 8px;">Director</th>
+                        <th style="border: 1px solid black; padding: 8px;">Release Date</th>
+                    </tr>
+                </thead>
+                <tbody id="movieTableBody">
+                   <h2 style="float : left"> Person's Films <br><h2>
+
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+const exampleParamValue = urlParams.get('exampleParam');
+    // Function to fetch and display person details
+    var count2=exampleParamValue;
+    fetch(`https://swapi.dev/api/people/${count2}/`)
+      .then(response => response.json())
+      .then(data => {
+        console.log(count2)
+        document.getElementById('personId').textContent = data.url.split('/').slice(-2, -1);
+        document.getElementById('personName').textContent = data.name;
+        document.getElementById('personGender').textContent = data.gender;
+        document.getElementById('personHeight').textContent = data.height;
+        document.getElementById('personHairColor').textContent = data.hair_color;
+        document.getElementById('personCreated').textContent = data.created;
+
+        
+        
+        const films = data.films; // Array of film URLs
+
+        // Function to fetch film details by URL
+        const fetchFilmDetails = url => {
+            return fetch(url)
+                .then(response => response.json());
+        };
+
+        // Fetch details of all films in parallel
+        Promise.all(films.map(fetchFilmDetails))
+            .then(filmsData => {
+                const movieTableBody = document.getElementById('movieTableBody');
+                
+                // Clear any existing content
+                movieTableBody.innerHTML = '';
+
+                // Iterate over each film's data and create rows
+                filmsData.forEach(film => {
+                    const row = document.createElement('tr');
+
+                    // Create and append cells for title, director, and release date
+                    const titleCell = document.createElement('td');
+                    titleCell.textContent = film.title;
+                    row.appendChild(titleCell);
+
+                    const directorCell = document.createElement('td');
+                    directorCell.textContent = film.director;
+                    row.appendChild(directorCell);
+
+                    const releaseDateCell = document.createElement('td');
+                    releaseDateCell.textContent = film.release_date;
+                    row.appendChild(releaseDateCell);
+
+                    // Append the row to the table body
+                    movieTableBody.appendChild(row);
+                });
+            })
+      })
+
+
+
+      
+
+      .catch(error => console.error('Error fetching person details:', error));
+
+
+
+  </script>
+
+
+
+
+
+</body>
+</html>
